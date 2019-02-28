@@ -20,7 +20,6 @@
         android:layout_width="@dimen/progress_bar_dimen"
         android:layout_height="@dimen/progress_bar_dimen"
         android:id="@+id/progressBar"
-        android:visibility="gone"
         android:layout_centerInParent="true"/>
 
 </RelativeLayout>

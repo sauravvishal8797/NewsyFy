@@ -44,6 +44,7 @@
                 android:id="@+id/article_source"
                 android:layout_below="@id/article_title"
                 android:text=""
+                android:textColor="@color/colorText"
                 android:layout_marginTop="0dp"
                 android:layout_marginLeft="6dp"
                 android:layout_marginRight="20dp"
@@ -56,6 +57,7 @@
                 android:layout_below="@id/article_title"
                 android:layout_toRightOf="@id/article_source"
                 android:text=""
+                android:textColor="@color/colorText"
                 android:layout_marginTop="0dp"
                 android:textSize="@dimen/article_source_text_size"/>
 

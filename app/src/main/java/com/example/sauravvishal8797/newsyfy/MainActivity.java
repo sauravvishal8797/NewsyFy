@@ -1,6 +1,7 @@
 package com.example.sauravvishal8797.newsyfy;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,7 +21,6 @@ import com.example.sauravvishal8797.newsyfy.networking.ApiInterface;
 import com.example.sauravvishal8797.newsyfy.utilities.Constants;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -34,7 +34,11 @@ public class MainActivity extends AppCompatActivity {
     private View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-
+            NewsArticleModel newsArticleModel = (NewsArticleModel)view.findViewById(R.id.article_title).getTag();
+            Intent intent = new Intent(MainActivity.this, NewsActivity.class);
+            intent.putExtra("url", newsArticleModel.getmUrl());
+            intent.putExtra("source", newsArticleModel.getNewsSourceModel().getmName());
+            startActivity(intent);
         }
     };
 
