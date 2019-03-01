@@ -1,7 +1,9 @@
 package com.example.sauravvishal8797.newsyfy;
 
+import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +11,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
@@ -19,6 +22,8 @@ import android.widget.ProgressBar;
 import com.example.sauravvishal8797.newsyfy.adapters.NewsAdapter;
 import com.example.sauravvishal8797.newsyfy.models.NewsArticleModel;
 import com.example.sauravvishal8797.newsyfy.models.NewsResponseModel;
+import com.example.sauravvishal8797.newsyfy.models.SourceInfo;
+import com.example.sauravvishal8797.newsyfy.models.SourceResponseModel;
 import com.example.sauravvishal8797.newsyfy.networking.ApiClient;
 import com.example.sauravvishal8797.newsyfy.networking.ApiInterface;
 import com.example.sauravvishal8797.newsyfy.utilities.Constants;
@@ -34,6 +39,12 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mNewsDisplayView;
     private ProgressBar mProgressBar;
     private NewsAdapter newsAdapter;
+
+    //to store all the news source IDs
+    private String[] sourceIds;
+
+    //to store all the news source names
+    private String[] sourceNames;
 
     //handles on-click action for adapter items
     private View.OnClickListener mOnClickListener = new View.OnClickListener() {
@@ -54,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
         android.support.v7.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(getResources().getString(R.string.app_name));
+        getAllSources();
         //getSupportActionBar().
         setUpUI();
     }
@@ -131,10 +143,41 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()){
-            case R.id.searchView:
-
+            case R.id.filter_by_source:
+                displayDialog(sourceIds, sourceNames);
+                return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void displayDialog(final String[] sourceIds, String[] sourceNames){
+        final ArrayList<String> selectedSources = new ArrayList<>();
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getResources().getString(R.string.source_select_dialog_title));
+        builder.setMultiChoiceItems(sourceNames, null, new DialogInterface.OnMultiChoiceClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i, boolean b) {
+                if (b)
+                    selectedSources.add(sourceIds[i]);
+                else selectedSources.remove(sourceIds[i]);
+            }
+        });
+
+        builder.setNegativeButton(getResources().getString(R.string.cancel_button_text).toUpperCase(), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+
+        builder.setPositiveButton(getResources().getString(R.string.ok_button_text).toUpperCase(), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     /**
@@ -192,6 +235,35 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<NewsResponseModel> call, Throwable t) {
+
+            }
+        });
+    }
+
+    /**
+     * retrieves all the available news sources
+     * @return a list containing all the sources names and ids
+     */
+    private void getAllSources(){
+        ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
+        Call<SourceResponseModel> call = apiInterface.getAllTheSources(Constants.API_KEY);
+        call.enqueue(new Callback<SourceResponseModel>() {
+            @Override
+            public void onResponse(Call<SourceResponseModel> call, Response<SourceResponseModel> response) {
+                if (response.isSuccessful()){
+                    Log.i("aaaaaa", "aa");
+                    ArrayList<SourceInfo> sources = response.body().getmSourceInfo();
+                    sourceIds = new String[sources.size()];
+                    sourceNames = new String[sources.size()];
+                    for (int i=0; i<sources.size(); i++){
+                        sourceIds[i] = sources.get(i).getmId();
+                        sourceNames[i] = sources.get(i).getmName();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SourceResponseModel> call, Throwable t) {
 
             }
         });

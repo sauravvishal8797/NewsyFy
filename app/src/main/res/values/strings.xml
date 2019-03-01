@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">NewsyFy</string>
+    <string name="search_option_title">Search</string>
+    <string name="filter_by_source_option_title">Filter by source</string>
+    <string name="cancel_button_text">Cancel</string>
+    <string name="ok_button_text">Ok</string>
+    <string name="source_select_dialog_title">Select news source</string>
 </resources>
