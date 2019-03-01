@@ -101,9 +101,11 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String s) {
-                mProgressBar.setVisibility(View.VISIBLE);
-                newsAdapter.swapDataSet(new ArrayList<NewsArticleModel>());
-                getSearchedArticles(s);
+                if (!s.isEmpty()) {
+                    mProgressBar.setVisibility(View.VISIBLE);
+                    newsAdapter.swapDataSet(new ArrayList<NewsArticleModel>());
+                    getSearchedArticles(s);
+                }
                 return true;
             }
         });
@@ -115,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+                newsAdapter.swapDataSet(new ArrayList<NewsArticleModel>());
                 mProgressBar.setVisibility(View.VISIBLE);
                 getTopHeadLines();
                 return true;

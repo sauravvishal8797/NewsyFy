@@ -10,7 +10,7 @@
     <WebView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/custom_toolbar_height"
+        android:layout_marginTop="?attr/actionBarSize"
         android:id="@+id/news_web_view">
     </WebView>
 
