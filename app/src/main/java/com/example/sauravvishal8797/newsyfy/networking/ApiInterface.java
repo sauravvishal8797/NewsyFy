@@ -8,12 +8,17 @@ import retrofit2.http.Query;
 
 public interface ApiInterface {
 
-    //end-point to retrive top-news headlines
+    //retrieves top-news headlines
     @GET("top-headlines")
     Call<NewsResponseModel> getTopHeadLines(@Query("country") String country, @Query("apiKey") String apiKey);
 
-    //end-point to retrive category-wise top-news headlines
+    //retrives category-wise top-news headlines
     @GET("top-headlines")
     Call<NewsResponseModel> getTopHeadlinesCategoryWise(@Query("country") String country, @Query("category") String category,
                                                         @Query("apiKey") String apiKey);
+
+    //Returns all the newsArticles containing the search query
+    @GET("everything")
+    Call<NewsResponseModel> getItemsWithSearchWord(@Query("q") String queryString, @Query("apiKey") String apiKey);
+
 }

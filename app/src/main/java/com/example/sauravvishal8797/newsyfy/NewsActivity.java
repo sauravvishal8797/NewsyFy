@@ -29,7 +29,6 @@ public class NewsActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(intent.getStringExtra("source"));
         webView = findViewById(R.id.news_web_view);
         progressBar = findViewById(R.id.webview_progress_bar);
-        //progressBar.setVisibility(View.VISIBLE);
         initWebView();
         webView.loadUrl(intent.getStringExtra("url"));
     }

@@ -57,6 +57,11 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
         onClickListener = lis;
     }
 
+    public void swapDataSet(ArrayList<NewsArticleModel> newDataSet){
+        newsArticles = newDataSet;
+        notifyDataSetChanged();
+    }
+
     class ViewHolder extends RecyclerView.ViewHolder {
 
         ImageView articleCoverImage;
