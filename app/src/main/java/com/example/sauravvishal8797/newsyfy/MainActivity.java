@@ -59,6 +59,9 @@ public class MainActivity extends AppCompatActivity {
     //to keep track whether loading is being performed on the basis of some search query
     private boolean isSearchLoading = false;
 
+    //storing search query for particular search
+    private String searchQuery = " ";
+
     //to store all the news source names
     private String[] sourceNames;
 
@@ -140,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
         if (isSearchLoading){
             mProgressBar.setVisibility(View.VISIBLE);
             pageNo++;
-           // getSearchedArticles();
+            getSearchedArticles(searchQuery);
         } else {
             mProgressBar.setVisibility(View.VISIBLE);
             pageNo++;
@@ -179,6 +182,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String s) {
+                searchQuery = s;
+                isSearchLoading = true;
                 if (!s.isEmpty()) {
                     displayProgressBar(true);
                     getSearchedArticles(s);
@@ -194,8 +199,13 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onMenuItemActionCollapse(MenuItem menuItem) {
-                displayProgressBar(true);
-                getTopHeadLines(pageNo);
+                isSearchLoading = false;
+                if (!searchQuery.isEmpty()){
+                    Log.i("sattire", searchQuery);
+                    displayProgressBar(true);
+                    getTopHeadLines(pageNo);
+                }
+
                 return true;
             }
         });
