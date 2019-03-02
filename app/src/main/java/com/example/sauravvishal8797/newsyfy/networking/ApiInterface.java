@@ -1,10 +1,7 @@
 package com.example.sauravvishal8797.newsyfy.networking;
 
 import com.example.sauravvishal8797.newsyfy.models.NewsResponseModel;
-import com.example.sauravvishal8797.newsyfy.models.SourceInfo;
 import com.example.sauravvishal8797.newsyfy.models.SourceResponseModel;
-
-import java.util.ArrayList;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -15,6 +12,10 @@ public interface ApiInterface {
     //retrieves top-news headlines
     @GET("top-headlines")
     Call<NewsResponseModel> getTopHeadLines(@Query("country") String country, @Query("apiKey") String apiKey);
+
+    //retrieve top-news headlines from specified sources
+    @GET("top-headlines")
+    Call<NewsResponseModel> getHeadLinesFromSources( @Query("sources") String sources, @Query("apiKey") String apiKey);
 
     //retrives category-wise top-news headlines
     @GET("top-headlines")

@@ -1,7 +1,6 @@
 package com.example.sauravvishal8797.newsyfy;
 
 import android.app.AlertDialog;
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,7 +10,6 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
@@ -46,6 +44,10 @@ public class MainActivity extends AppCompatActivity {
     //to store all the news source names
     private String[] sourceNames;
 
+    //to retrieve the country code
+    private TelephonyManager telephonyManager;
+    private String countryISO;
+
     //handles on-click action for adapter items
     private View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override
@@ -65,8 +67,12 @@ public class MainActivity extends AppCompatActivity {
         android.support.v7.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(getResources().getString(R.string.app_name));
+
+        //retrieving the country code
+        telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        countryISO = telephonyManager.getNetworkCountryIso();
+
         getAllSources();
-        //getSupportActionBar().
         setUpUI();
     }
 
@@ -84,7 +90,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.overflow, menu);
-        SearchManager searchManager = (SearchManager)getSystemService(Context.SEARCH_SERVICE);
         MenuItem item = menu.findItem(R.id.searchView);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
         searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
@@ -114,8 +119,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextChange(String s) {
                 if (!s.isEmpty()) {
-                    mProgressBar.setVisibility(View.VISIBLE);
-                    newsAdapter.swapDataSet(new ArrayList<NewsArticleModel>());
+                    displayProgressBar(true);
                     getSearchedArticles(s);
                 }
                 return true;
@@ -129,13 +133,11 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onMenuItemActionCollapse(MenuItem menuItem) {
-                newsAdapter.swapDataSet(new ArrayList<NewsArticleModel>());
-                mProgressBar.setVisibility(View.VISIBLE);
+                displayProgressBar(true);
                 getTopHeadLines();
                 return true;
             }
         });
-
         return true;
     }
 
@@ -173,11 +175,26 @@ public class MainActivity extends AppCompatActivity {
         builder.setPositiveButton(getResources().getString(R.string.ok_button_text).toUpperCase(), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-
+                StringBuilder stringBuilder = new StringBuilder();
+                dialogInterface.dismiss();
+                for (String id: selectedSources){
+                    stringBuilder.append(id+",");
+                }
+                displayProgressBar(true);
+                getSourceFilteredArticles(stringBuilder.toString().substring(0, stringBuilder.toString().length()));
             }
         });
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    private void displayProgressBar(boolean toDisplay){
+        if (toDisplay){
+            newsAdapter.swapDataSet(new ArrayList<NewsArticleModel>());
+            mProgressBar.setVisibility(View.VISIBLE);
+        } else {
+            mProgressBar.setVisibility(View.GONE);
+        }
     }
 
     /**
@@ -198,12 +215,11 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<NewsResponseModel> call, Response<NewsResponseModel> response) {
                 if (response!=null) {
                     articles[0] = response.body().getmNewsArticleModels();
-                    mProgressBar.setVisibility(View.GONE);
+                    displayProgressBar(false);
                     newsAdapter = new NewsAdapter(getApplicationContext(), articles[0]);
                     newsAdapter.setOnClickListener(mOnClickListener);
                     mNewsDisplayView.setAdapter(newsAdapter);
                 }
-
             }
 
             @Override
@@ -219,8 +235,6 @@ public class MainActivity extends AppCompatActivity {
      */
     public void getSearchedArticles(String searchKeyword){
         final ArrayList<NewsArticleModel>[] articles = new ArrayList[]{new ArrayList<>()};
-        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        String countryISO = telephonyManager.getNetworkCountryIso();
         ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
         Call<NewsResponseModel> call = apiInterface.getItemsWithSearchWord(searchKeyword, Constants.API_KEY);
         call.enqueue(new Callback<NewsResponseModel>() {
@@ -228,7 +242,7 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<NewsResponseModel> call, Response<NewsResponseModel> response) {
                 if (response!=null) {
                     articles[0] = response.body().getmNewsArticleModels();
-                    mProgressBar.setVisibility(View.GONE);
+                    displayProgressBar(false);
                     newsAdapter.swapDataSet(articles[0]);
                 }
             }
@@ -251,7 +265,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<SourceResponseModel> call, Response<SourceResponseModel> response) {
                 if (response.isSuccessful()){
-                    Log.i("aaaaaa", "aa");
                     ArrayList<SourceInfo> sources = response.body().getmSourceInfo();
                     sourceIds = new String[sources.size()];
                     sourceNames = new String[sources.size()];
@@ -264,6 +277,30 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<SourceResponseModel> call, Throwable t) {
+
+            }
+        });
+    }
+
+    /**filters articles based on sources
+     * @return a list of articles from the specified sources
+     */
+    private void getSourceFilteredArticles(String sources){
+        final ArrayList<NewsArticleModel>[] articles = new ArrayList[]{new ArrayList<>()};
+        ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
+        Call<NewsResponseModel> call = apiInterface.getHeadLinesFromSources(sources, Constants.API_KEY);
+        call.enqueue(new Callback<NewsResponseModel>() {
+            @Override
+            public void onResponse(Call<NewsResponseModel> call, Response<NewsResponseModel> response) {
+                if (response.isSuccessful()){
+                    articles[0] = response.body().getmNewsArticleModels();
+                    displayProgressBar(false);
+                    newsAdapter.swapDataSet(articles[0]);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<NewsResponseModel> call, Throwable t) {
 
             }
         });
