@@ -10,8 +10,21 @@
         app:actionViewClass="android.support.v7.widget.SearchView"
         app:showAsAction="collapseActionView|always" />
 
-    <item android:id="@+id/filter_by_source"
-        android:title="@string/filter_by_source_option_title"
-        app:showAsAction="never"/>
+    <item android:id="@+id/filter_news"
+        android:title="@string/filter_option_title"
+        android:icon="@drawable/ic_sort_white_24dp"
+        app:showAsAction="collapseActionView|always">
 
+        <menu>
+
+            <item android:id="@+id/filter_by_source"
+                android:title="@string/filter_by_source_option_title"
+                app:showAsAction="never"/>
+
+            <item android:id="@+id/filter_by_date"
+                android:title="@string/filter_by_date_option_title"
+                app:showAsAction="never"/>
+
+        </menu>
+    </item>
 </menu>

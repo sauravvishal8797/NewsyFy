@@ -27,6 +27,7 @@ import com.example.sauravvishal8797.newsyfy.networking.ApiInterface;
 import com.example.sauravvishal8797.newsyfy.utilities.Constants;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -37,6 +38,9 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mNewsDisplayView;
     private ProgressBar mProgressBar;
     private NewsAdapter newsAdapter;
+
+    //to store/display the news articles retrieved
+    private ArrayList<NewsArticleModel> newsDataList;
 
     //to store all the news source IDs
     private String[] sourceIds;
@@ -64,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        newsDataList = new ArrayList<>();
         android.support.v7.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(getResources().getString(R.string.app_name));
@@ -148,6 +153,10 @@ public class MainActivity extends AppCompatActivity {
             case R.id.filter_by_source:
                 displayDialog(sourceIds, sourceNames);
                 return true;
+
+            case R.id.filter_by_date:
+                //Collections.sort(newsDataList);
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -190,7 +199,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void displayProgressBar(boolean toDisplay){
         if (toDisplay){
-            newsAdapter.swapDataSet(new ArrayList<NewsArticleModel>());
+            newsDataList = new ArrayList<>();
+            newsAdapter.swapDataSet(newsDataList);
             mProgressBar.setVisibility(View.VISIBLE);
         } else {
             mProgressBar.setVisibility(View.GONE);
@@ -203,8 +213,6 @@ public class MainActivity extends AppCompatActivity {
      */
     public void getTopHeadLines(){
         Call<NewsResponseModel> call=null;
-        final ArrayList<NewsArticleModel>[] articles = new ArrayList[]{new ArrayList<>()};
-        final ArrayList<NewsArticleModel> newsArticles = new ArrayList<>();
         TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         String countryISO = telephonyManager.getNetworkCountryIso();
         ApiInterface apiService =
@@ -214,9 +222,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<NewsResponseModel> call, Response<NewsResponseModel> response) {
                 if (response!=null) {
-                    articles[0] = response.body().getmNewsArticleModels();
+                    newsDataList = response.body().getmNewsArticleModels();
                     displayProgressBar(false);
-                    newsAdapter = new NewsAdapter(getApplicationContext(), articles[0]);
+                    newsAdapter = new NewsAdapter(getApplicationContext(), newsDataList);
                     newsAdapter.setOnClickListener(mOnClickListener);
                     mNewsDisplayView.setAdapter(newsAdapter);
                 }
@@ -234,16 +242,15 @@ public class MainActivity extends AppCompatActivity {
      * @return List of news articles
      */
     public void getSearchedArticles(String searchKeyword){
-        final ArrayList<NewsArticleModel>[] articles = new ArrayList[]{new ArrayList<>()};
         ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
         Call<NewsResponseModel> call = apiInterface.getItemsWithSearchWord(searchKeyword, Constants.API_KEY);
         call.enqueue(new Callback<NewsResponseModel>() {
             @Override
             public void onResponse(Call<NewsResponseModel> call, Response<NewsResponseModel> response) {
                 if (response!=null) {
-                    articles[0] = response.body().getmNewsArticleModels();
+                    newsDataList = response.body().getmNewsArticleModels();
                     displayProgressBar(false);
-                    newsAdapter.swapDataSet(articles[0]);
+                    newsAdapter.swapDataSet(newsDataList);
                 }
             }
 
@@ -286,16 +293,15 @@ public class MainActivity extends AppCompatActivity {
      * @return a list of articles from the specified sources
      */
     private void getSourceFilteredArticles(String sources){
-        final ArrayList<NewsArticleModel>[] articles = new ArrayList[]{new ArrayList<>()};
         ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
         Call<NewsResponseModel> call = apiInterface.getHeadLinesFromSources(sources, Constants.API_KEY);
         call.enqueue(new Callback<NewsResponseModel>() {
             @Override
             public void onResponse(Call<NewsResponseModel> call, Response<NewsResponseModel> response) {
                 if (response.isSuccessful()){
-                    articles[0] = response.body().getmNewsArticleModels();
+                    newsDataList = response.body().getmNewsArticleModels();
                     displayProgressBar(false);
-                    newsAdapter.swapDataSet(articles[0]);
+                    newsAdapter.swapDataSet(newsDataList);
                 }
             }
 
