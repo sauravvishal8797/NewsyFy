@@ -28,12 +28,12 @@
                 android:id="@+id/article_title"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="3dp"
-                android:layout_marginRight="5dp"
-                android:layout_marginLeft="6dp"
+                android:layout_marginRight="7dp"
+                android:layout_marginLeft="10dp"
                 android:maxLines="3"
                 android:ellipsize="end"
                 android:textColor="@color/colorText"
-                android:text=""
+                android:text="Hey there this is the svhsjsjs, India vs Aurtralia"
                 android:textStyle="normal"
                 android:textSize="@dimen/article_title_text"
                 android:layout_below="@id/article_cover_image"/>
@@ -46,7 +46,7 @@
                 android:text=""
                 android:textColor="@color/colorText"
                 android:layout_marginTop="0dp"
-                android:layout_marginLeft="6dp"
+                android:layout_marginLeft="10dp"
                 android:layout_marginRight="20dp"
                 android:textSize="@dimen/article_source_text_size" />
 
