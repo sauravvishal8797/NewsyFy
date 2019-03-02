@@ -4,12 +4,14 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
@@ -44,6 +46,18 @@ public class MainActivity extends AppCompatActivity {
 
     //to store all the news source IDs
     private String[] sourceIds;
+
+    //to keep track of the no of pages to display the news feed
+    private int pageNo = 1;
+
+    //to keep track of the total no of results to be returned by the api
+    private int totalResults = 0;
+
+    //to keep track whether results are being loaded
+    private boolean isLoading = false;
+
+    //to keep track whether loading is being performed on the basis of some search query
+    private boolean isSearchLoading = false;
 
     //to store all the news source names
     private String[] sourceNames;
@@ -86,10 +100,52 @@ public class MainActivity extends AppCompatActivity {
         mNewsDisplayView = findViewById(R.id.news_display_recyclerview);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         mNewsDisplayView.setLayoutManager(linearLayoutManager);
+        newsAdapter = new NewsAdapter(this, newsDataList);
+        newsAdapter.setOnClickListener(mOnClickListener);
+        mNewsDisplayView.setAdapter(newsAdapter);
+        initScrollListener(linearLayoutManager);
         mProgressBar = findViewById(R.id.progressBar);
         mProgressBar.setVisibility(View.VISIBLE);
         mProgressBar.setClickable(false);
-        getTopHeadLines();
+        getTopHeadLines(pageNo);
+    }
+
+    private void initScrollListener(final LinearLayoutManager layoutManager){
+        mNewsDisplayView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (!isLoading){
+                    int visibleItemCount = layoutManager.getChildCount();
+                    int totalItemCount = layoutManager.getItemCount();
+                    int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
+                    if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount && firstVisibleItemPosition >= 0) {
+                        int item = totalResults / pageNo;
+                        if (item > Constants.RESULTS_PER_PAGE) {
+                            loadMore(isSearchLoading);
+                            isLoading = true;
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    private void loadMore(boolean isSearchLoading){
+        if (isSearchLoading){
+            mProgressBar.setVisibility(View.VISIBLE);
+            pageNo++;
+           // getSearchedArticles();
+        } else {
+            mProgressBar.setVisibility(View.VISIBLE);
+            pageNo++;
+            getTopHeadLines(pageNo);
+        }
     }
 
     @Override
@@ -139,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onMenuItemActionCollapse(MenuItem menuItem) {
                 displayProgressBar(true);
-                getTopHeadLines();
+                getTopHeadLines(pageNo);
                 return true;
             }
         });
@@ -151,11 +207,13 @@ public class MainActivity extends AppCompatActivity {
 
         switch (item.getItemId()){
             case R.id.filter_by_source:
+                pageNo=1;
                 displayDialog(sourceIds, sourceNames);
                 return true;
 
             case R.id.filter_by_date:
                 //Collections.sort(newsDataList);
+
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -211,22 +269,25 @@ public class MainActivity extends AppCompatActivity {
      * retrieves top news articles based on location
      * @return List of news Articles to display
      */
-    public void getTopHeadLines(){
+    public void getTopHeadLines(int pageNo){
         Call<NewsResponseModel> call=null;
-        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        String countryISO = telephonyManager.getNetworkCountryIso();
+        telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        countryISO = telephonyManager.getNetworkCountryIso();
         ApiInterface apiService =
                 ApiClient.getClient().create(ApiInterface.class);
-        call = apiService.getTopHeadLines(countryISO, Constants.API_KEY);
+        call = apiService.getTopHeadLines(countryISO, Constants.RESULTS_PER_PAGE, pageNo, Constants.API_KEY);
         call.enqueue(new Callback<NewsResponseModel>() {
             @Override
             public void onResponse(Call<NewsResponseModel> call, Response<NewsResponseModel> response) {
                 if (response!=null) {
-                    newsDataList = response.body().getmNewsArticleModels();
+                    if (isLoading)
+                        newsDataList.addAll(response.body().getmNewsArticleModels());
+                    else newsDataList = response.body().getmNewsArticleModels();
+                    totalResults = response.body().getmTotalResults();
+                    Log.i("machaaa", String.valueOf(newsDataList.size()));
                     displayProgressBar(false);
-                    newsAdapter = new NewsAdapter(getApplicationContext(), newsDataList);
-                    newsAdapter.setOnClickListener(mOnClickListener);
-                    mNewsDisplayView.setAdapter(newsAdapter);
+                    newsAdapter.swapDataSet(newsDataList);
+                    isLoading = false;
                 }
             }
 
@@ -242,15 +303,20 @@ public class MainActivity extends AppCompatActivity {
      * @return List of news articles
      */
     public void getSearchedArticles(String searchKeyword){
+        isSearchLoading = true;
         ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
-        Call<NewsResponseModel> call = apiInterface.getItemsWithSearchWord(searchKeyword, Constants.API_KEY);
+        Call<NewsResponseModel> call = apiInterface.getItemsWithSearchWord(searchKeyword, Constants.RESULTS_PER_PAGE, pageNo,
+                Constants.API_KEY);
         call.enqueue(new Callback<NewsResponseModel>() {
             @Override
             public void onResponse(Call<NewsResponseModel> call, Response<NewsResponseModel> response) {
                 if (response!=null) {
-                    newsDataList = response.body().getmNewsArticleModels();
+                    if (isLoading)
+                        newsDataList.addAll(response.body().getmNewsArticleModels());
+                    else newsDataList = response.body().getmNewsArticleModels();
                     displayProgressBar(false);
                     newsAdapter.swapDataSet(newsDataList);
+                    isLoading = false;
                 }
             }
 
@@ -294,14 +360,18 @@ public class MainActivity extends AppCompatActivity {
      */
     private void getSourceFilteredArticles(String sources){
         ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
-        Call<NewsResponseModel> call = apiInterface.getHeadLinesFromSources(sources, Constants.API_KEY);
+        Call<NewsResponseModel> call = apiInterface.getHeadLinesFromSources(sources, Constants.RESULTS_PER_PAGE, pageNo,
+                Constants.API_KEY);
         call.enqueue(new Callback<NewsResponseModel>() {
             @Override
             public void onResponse(Call<NewsResponseModel> call, Response<NewsResponseModel> response) {
                 if (response.isSuccessful()){
-                    newsDataList = response.body().getmNewsArticleModels();
+                    if (isLoading)
+                        newsDataList.addAll(response.body().getmNewsArticleModels());
+                    else newsDataList = response.body().getmNewsArticleModels();
                     displayProgressBar(false);
                     newsAdapter.swapDataSet(newsDataList);
+                    isLoading = false;
                 }
             }
 
