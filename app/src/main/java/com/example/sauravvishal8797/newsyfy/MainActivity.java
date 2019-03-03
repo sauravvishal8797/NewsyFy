@@ -27,6 +27,9 @@ import com.example.sauravvishal8797.newsyfy.models.SourceResponseModel;
 import com.example.sauravvishal8797.newsyfy.networking.ApiClient;
 import com.example.sauravvishal8797.newsyfy.networking.ApiInterface;
 import com.example.sauravvishal8797.newsyfy.utilities.Constants;
+import com.example.sauravvishal8797.newsyfy.utilities.NotificationJobScheduler;
+import com.firebase.jobdispatcher.FirebaseJobDispatcher;
+import com.firebase.jobdispatcher.GooglePlayDriver;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -85,6 +88,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //Trending news notification job scheduler
+        NotificationJobScheduler notificationJobScheduler = new NotificationJobScheduler(this);
+        notificationJobScheduler.scheduleJob();
+
         newsDataList = new ArrayList<>();
         android.support.v7.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

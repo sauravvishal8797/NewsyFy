@@ -23,6 +23,12 @@
         </activity>
         <activity android:name=".NewsActivity"
             android:parentActivityName=".MainActivity"></activity>
+        <service android:name=".service.NotificationJobService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>
