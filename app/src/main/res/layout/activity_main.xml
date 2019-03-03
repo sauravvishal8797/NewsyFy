@@ -7,14 +7,22 @@
 
     <include layout="@layout/custom_toolbar"/>
 
-    <android.support.v7.widget.RecyclerView
+    <android.support.v4.widget.SwipeRefreshLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:id="@+id/news_display_recyclerview"
-        android:scrollbars="vertical">
+        android:id="@+id/onSwipeRefresh"
+        android:layout_marginTop="?attr/actionBarSize">
 
-    </android.support.v7.widget.RecyclerView>
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="?attr/actionBarSize"
+            android:id="@+id/news_display_recyclerview"
+            android:scrollbars="vertical">
+
+        </android.support.v7.widget.RecyclerView>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
     <ProgressBar
         android:layout_width="@dimen/progress_bar_dimen"

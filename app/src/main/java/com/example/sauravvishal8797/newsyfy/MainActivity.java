@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mNewsDisplayView;
     private ProgressBar mProgressBar;
     private NewsAdapter newsAdapter;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     //to store/display the news articles retrieved
     private ArrayList<NewsArticleModel> newsDataList;
@@ -62,6 +64,9 @@ public class MainActivity extends AppCompatActivity {
     //to keep track whether loading is being performed on the basis of some search query
     private boolean isSearchLoading = false;
 
+    //to keep track whether source filtering is on
+    private boolean isSourceFiltering = false;
+
     //storing search query for particular search
     private String searchQuery = " ";
 
@@ -73,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
     private String countryISO;
 
     //handles on-click action for adapter items
-    private View.OnClickListener mOnClickListener = new View.OnClickListener() {
+    private View.OnClickListener mOnClickListener = new View.OnClickListener(){
         @Override
         public void onClick(View view) {
             NewsArticleModel newsArticleModel = (NewsArticleModel)view.findViewById(R.id.article_title).getTag();
@@ -81,6 +86,19 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra("url", newsArticleModel.getmUrl());
             intent.putExtra("source", newsArticleModel.getNewsSourceModel().getmName());
             startActivity(intent);
+        }
+    };
+
+    //handles onSwipe refresh configurations
+    private SwipeRefreshLayout.OnRefreshListener refreshListener = new SwipeRefreshLayout.OnRefreshListener() {
+        @Override
+        public void onRefresh() {
+            pageNo = 1;
+            if (isSearchLoading){
+                getSearchedArticles(searchQuery);
+            } else {
+                getTopHeadLines(pageNo);
+            }
         }
     };
 
@@ -107,6 +125,8 @@ public class MainActivity extends AppCompatActivity {
 
     /**Sets up the UI for displaying news articles*/
     private void setUpUI() {
+        mSwipeRefreshLayout = findViewById(R.id.onSwipeRefresh);
+        mSwipeRefreshLayout.setOnRefreshListener(refreshListener);
         mNewsDisplayView = findViewById(R.id.news_display_recyclerview);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         mNewsDisplayView.setLayoutManager(linearLayoutManager);
@@ -252,6 +272,7 @@ public class MainActivity extends AppCompatActivity {
         builder.setNegativeButton(getResources().getString(R.string.cancel_button_text).toUpperCase(), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+                isSourceFiltering = false;
                 dialogInterface.dismiss();
             }
         });
@@ -259,6 +280,7 @@ public class MainActivity extends AppCompatActivity {
         builder.setPositiveButton(getResources().getString(R.string.ok_button_text).toUpperCase(), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+                isSourceFiltering = true;
                 StringBuilder stringBuilder = new StringBuilder();
                 dialogInterface.dismiss();
                 for (String id: selectedSources){
@@ -274,10 +296,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void displayProgressBar(boolean toDisplay){
         if (toDisplay){
+            mSwipeRefreshLayout.setEnabled(false);
             newsDataList = new ArrayList<>();
             newsAdapter.swapDataSet(newsDataList);
             mProgressBar.setVisibility(View.VISIBLE);
         } else {
+            mSwipeRefreshLayout.setEnabled(true);
             mProgressBar.setVisibility(View.GONE);
         }
     }
@@ -301,8 +325,12 @@ public class MainActivity extends AppCompatActivity {
                         newsDataList.addAll(response.body().getmNewsArticleModels());
                     else newsDataList = response.body().getmNewsArticleModels();
                     totalResults = response.body().getmTotalResults();
-                    Log.i("machaaa", String.valueOf(newsDataList.size()));
+                    Log.i("machaaannnnnnn", String.valueOf(newsDataList.size()));
                     displayProgressBar(false);
+                    if (mSwipeRefreshLayout.isRefreshing()) {
+                        Log.i("machaaa", String.valueOf(newsDataList.size()));
+                        mSwipeRefreshLayout.setRefreshing(false);
+                    }
                     newsAdapter.swapDataSet(newsDataList);
                     isLoading = false;
                 }
@@ -332,6 +360,7 @@ public class MainActivity extends AppCompatActivity {
                         newsDataList.addAll(response.body().getmNewsArticleModels());
                     else newsDataList = response.body().getmNewsArticleModels();
                     displayProgressBar(false);
+                    mSwipeRefreshLayout.setRefreshing(false);
                     newsAdapter.swapDataSet(newsDataList);
                     isLoading = false;
                 }
