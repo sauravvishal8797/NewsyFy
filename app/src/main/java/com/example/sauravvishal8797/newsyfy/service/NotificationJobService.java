@@ -47,7 +47,9 @@ public class NotificationJobService extends JobService{
                     NewsArticleModel topNewsArticle = newsArticleModels.get(0);
                     String title = topNewsArticle.getmTitle();
                     String text = topNewsArticle.getmDescription();
-                    showNotification(title, text);
+                    String url = topNewsArticle.getmUrl();
+                    String source = topNewsArticle.getNewsSourceModel().getmName();
+                    showNotification(title, text, url, source);
                 }
             }
 
@@ -58,9 +60,9 @@ public class NotificationJobService extends JobService{
         });
     }
 
-    private void showNotification(String title, String text){
+    private void showNotification(String title, String text, String url, String source){
         NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
         notificationHelper.createNotificationChannel();
-        notificationHelper.sendNotification(title, text);
+        notificationHelper.sendNotification(title, text, url, source);
     }
 }
