@@ -13,7 +13,10 @@ import com.example.sauravvishal8797.newsyfy.R;
 import com.example.sauravvishal8797.newsyfy.models.NewsArticleModel;
 import com.squareup.picasso.Picasso;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
@@ -41,11 +44,31 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
         NewsArticleModel article = newsArticles.get(i);
         viewHolder.articleTitleText.setText(article.getmTitle());
         viewHolder.articleSourceText.setText(article.getNewsSourceModel().getmName());
-        viewHolder.articlePublishTimeText.setText(article.getmPublishTime());
+        String publishTimeDate = article.getmPublishTime().substring(0, article.getmPublishTime().indexOf("T"));
+        viewHolder.articlePublishTimeText.setText(getFormattedPublishTime(publishTimeDate));
 
         //loading cover image using Picasso library
         Picasso.with(mContext).load(article.getmUrlToImage()).into(viewHolder.articleCoverImage);
         viewHolder.articleTitleText.setTag(article);
+    }
+
+    /**
+     * Changes publish date to the format(Feb 23 2019)
+     * @param date
+     * @return formatted date String
+     */
+    public String getFormattedPublishTime(String date){
+        String formattedPublishDate = " ";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat requiredDateFormat = new SimpleDateFormat("MMM dd yyyy");
+        Date date1 = null;
+        try {
+            date1 = simpleDateFormat.parse(date);
+            formattedPublishDate = requiredDateFormat.format(date1);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return formattedPublishDate;
     }
 
     @Override

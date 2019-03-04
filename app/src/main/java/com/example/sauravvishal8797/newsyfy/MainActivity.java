@@ -315,6 +315,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * retrieves top news articles based on location
+     * @param pageNo
      * @return List of news Articles to display
      */
     public void getTopHeadLines(int pageNo){
@@ -350,6 +351,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * retrieves news articles based on some search query
+     * @param searchKeyword
      * @return List of news articles
      */
     public void getSearchedArticles(String searchKeyword){
@@ -407,6 +409,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**filters articles based on sources
+     * @param sources String to filter the news acc to sources
      * @return a list of articles from the specified sources
      */
     private void getSourceFilteredArticles(String sources){
