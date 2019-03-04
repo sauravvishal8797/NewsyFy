@@ -13,6 +13,8 @@ public class NewsResponseModel {
     @SerializedName("articles")
     private ArrayList<NewsArticleModel> mNewsArticleModels;
 
+    public NewsResponseModel(){}
+
     public NewsResponseModel(String mStatus, int mTotalResults, ArrayList<NewsArticleModel> mNewsArticleModels){
         this.mStatus = mStatus;
         this.mTotalResults = mTotalResults;

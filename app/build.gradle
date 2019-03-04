@@ -41,6 +41,13 @@ dependencies {
     //Firebase Job Dispatcher
     implementation 'com.firebase:firebase-jobdispatcher:0.8.6'
 
+    //okHttp client
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.0'
+
+    //mockito integration
+    implementation 'org.mockito:mockito-core:1.10.19'
+
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }

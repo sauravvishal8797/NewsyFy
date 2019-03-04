@@ -29,8 +29,19 @@ public class NewsActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(intent.getStringExtra("source"));
         webView = findViewById(R.id.news_web_view);
         progressBar = findViewById(R.id.webview_progress_bar);
+        displayProgressBar(true);
         initWebView();
-        webView.loadUrl(intent.getStringExtra("url"));
+        loadUrl(intent.getStringExtra("url"));
+    }
+
+    public void loadUrl(String url){
+        webView.loadUrl(url);
+    }
+
+    public void displayProgressBar(boolean toDisplay){
+        if (toDisplay){
+            progressBar.setVisibility(View.VISIBLE);
+        } else progressBar.setVisibility(View.GONE);
     }
 
     private void initWebView(){
@@ -40,14 +51,14 @@ public class NewsActivity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                progressBar.setVisibility(View.GONE);
+                displayProgressBar(false);
                 invalidateOptionsMenu();
             }
 
             @Override
             public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
                 super.onReceivedError(view, request, error);
-                progressBar.setVisibility(View.GONE);
+                displayProgressBar(false);
                 invalidateOptionsMenu();
             }
         });

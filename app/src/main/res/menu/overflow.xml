@@ -23,6 +23,7 @@
 
             <item android:id="@+id/filter_by_date"
                 android:title="@string/filter_by_date_option_title"
+                android:checkable="true"
                 app:showAsAction="never"/>
 
         </menu>

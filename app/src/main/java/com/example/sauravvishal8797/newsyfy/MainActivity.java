@@ -249,8 +249,15 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.filter_by_date:
-                //Collections.sort(newsDataList);
-
+                 if (item.isChecked()){
+                     Log.i("checked", "yes");
+                     item.setChecked(false);
+                 } else {
+                     Log.i("checked", "no");
+                     item.setChecked(true);
+                     Collections.sort(newsDataList);
+                     newsAdapter.swapDataSet(newsDataList);
+                 }
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -325,10 +332,8 @@ public class MainActivity extends AppCompatActivity {
                         newsDataList.addAll(response.body().getmNewsArticleModels());
                     else newsDataList = response.body().getmNewsArticleModels();
                     totalResults = response.body().getmTotalResults();
-                    Log.i("machaaannnnnnn", String.valueOf(newsDataList.size()));
                     displayProgressBar(false);
                     if (mSwipeRefreshLayout.isRefreshing()) {
-                        Log.i("machaaa", String.valueOf(newsDataList.size()));
                         mSwipeRefreshLayout.setRefreshing(false);
                     }
                     newsAdapter.swapDataSet(newsDataList);

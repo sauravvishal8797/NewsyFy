@@ -1,8 +1,14 @@
 package com.example.sauravvishal8797.newsyfy.models;
 
+import android.support.annotation.NonNull;
+
 import com.google.gson.annotations.SerializedName;
 
-public class NewsArticleModel {
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class NewsArticleModel implements Comparable{
 
     @SerializedName("source")
     private NewsSourceModel newsSourceModel;
@@ -95,5 +101,24 @@ public class NewsArticleModel {
 
     public String getmContent() {
         return mContent;
+    }
+
+    /**compareTo method of the comparable interface to compare two date objects i.e the current object
+     * and the object passed as a parameter
+     * @param o
+     * @return
+     */
+    @Override
+    public int compareTo(@NonNull Object o) {
+        Date first = null, second = null;
+        String publishTime = ((NewsArticleModel)o).getmPublishTime();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        try {
+            first = simpleDateFormat.parse(publishTime);
+            second = simpleDateFormat.parse(mPublishTime);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return first.compareTo(second);
     }
 }
