@@ -24,7 +24,7 @@ public class NotificationJobScheduler {
     //Declaring FirebaseJobDispatcher object
     private FirebaseJobDispatcher firebaseJobDispatcher;
 
-    private int recurringPeriod = 60;
+    private int recurringPeriod = 60*60*3;
 
     public NotificationJobScheduler(Context context){
         mContext = context;
@@ -39,7 +39,7 @@ public class NotificationJobScheduler {
                 .setTag(UNIQUE_TAG)
                 // a recurring job
                 .setRecurring(true)
-                // persist forever
+                // persist until next boot
                 .setLifetime(Lifetime.UNTIL_NEXT_BOOT)
                 // start between 0 and 60 seconds from now
                 .setTrigger(Trigger.executionWindow(recurringPeriod, recurringPeriod+5))

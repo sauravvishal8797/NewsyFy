@@ -10,6 +10,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.webkit.WebView;
 
+import com.example.sauravvishal8797.newsyfy.NewsActivity;
 import com.example.sauravvishal8797.newsyfy.R;
 
 public class NotificationHelper {
@@ -40,7 +41,7 @@ public class NotificationHelper {
 
     private NotificationCompat.Builder getNotificationBuilder(String notificationTitle, String notificationtext,
                                                               String newsUrl, String sourceName){
-        Intent notificationIntent = new Intent(mContext, WebView.class);
+        Intent notificationIntent = new Intent(mContext, NewsActivity.class);
         notificationIntent.putExtra("url", newsUrl);
         notificationIntent.putExtra("source", sourceName);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
