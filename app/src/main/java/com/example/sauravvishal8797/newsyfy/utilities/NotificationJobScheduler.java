@@ -1,6 +1,7 @@
 package com.example.sauravvishal8797.newsyfy.utilities;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.example.sauravvishal8797.newsyfy.service.NotificationJobService;
 import com.firebase.jobdispatcher.Constraint;
@@ -10,6 +11,8 @@ import com.firebase.jobdispatcher.Job;
 import com.firebase.jobdispatcher.Lifetime;
 import com.firebase.jobdispatcher.RetryStrategy;
 import com.firebase.jobdispatcher.Trigger;
+
+import java.util.concurrent.TimeUnit;
 
 public class NotificationJobScheduler {
 
@@ -21,7 +24,7 @@ public class NotificationJobScheduler {
     //Declaring FirebaseJobDispatcher object
     private FirebaseJobDispatcher firebaseJobDispatcher;
 
-    private int recurringPeriod = 3 * 60 *60;
+    private int recurringPeriod = 60;
 
     public NotificationJobScheduler(Context context){
         mContext = context;
@@ -37,9 +40,9 @@ public class NotificationJobScheduler {
                 // a recurring job
                 .setRecurring(true)
                 // persist forever
-                .setLifetime(Lifetime.FOREVER)
+                .setLifetime(Lifetime.UNTIL_NEXT_BOOT)
                 // start between 0 and 60 seconds from now
-                .setTrigger(Trigger.executionWindow(recurringPeriod, 5))
+                .setTrigger(Trigger.executionWindow(recurringPeriod, recurringPeriod+5))
                 // don't overwrite an existing job with the same tag
                 .setReplaceCurrent(false)
                 // retry with exponential backoff

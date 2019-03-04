@@ -323,7 +323,7 @@ public class MainActivity extends AppCompatActivity {
         telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         countryISO = telephonyManager.getNetworkCountryIso();
         ApiInterface apiService =
-                ApiClient.getClient().create(ApiInterface.class);
+                ApiClient.getClient(this).create(ApiInterface.class);
         call = apiService.getTopHeadLines(countryISO, Constants.RESULTS_PER_PAGE, pageNo, Constants.API_KEY);
         call.enqueue(new Callback<NewsResponseModel>() {
             @Override
@@ -356,7 +356,7 @@ public class MainActivity extends AppCompatActivity {
      */
     public void getSearchedArticles(String searchKeyword){
         isSearchLoading = true;
-        ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
+        ApiInterface apiInterface = ApiClient.getClient(this).create(ApiInterface.class);
         Call<NewsResponseModel> call = apiInterface.getItemsWithSearchWord(searchKeyword, Constants.RESULTS_PER_PAGE, pageNo,
                 Constants.API_KEY);
         call.enqueue(new Callback<NewsResponseModel>() {
@@ -385,7 +385,7 @@ public class MainActivity extends AppCompatActivity {
      * @return a list containing all the sources names and ids
      */
     private void getAllSources(){
-        ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
+        ApiInterface apiInterface = ApiClient.getClient(this).create(ApiInterface.class);
         Call<SourceResponseModel> call = apiInterface.getAllTheSources(Constants.API_KEY);
         call.enqueue(new Callback<SourceResponseModel>() {
             @Override
@@ -413,7 +413,7 @@ public class MainActivity extends AppCompatActivity {
      * @return a list of articles from the specified sources
      */
     private void getSourceFilteredArticles(String sources){
-        ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
+        ApiInterface apiInterface = ApiClient.getClient(this).create(ApiInterface.class);
         Call<NewsResponseModel> call = apiInterface.getHeadLinesFromSources(sources, Constants.RESULTS_PER_PAGE, pageNo,
                 Constants.API_KEY);
         call.enqueue(new Callback<NewsResponseModel>() {

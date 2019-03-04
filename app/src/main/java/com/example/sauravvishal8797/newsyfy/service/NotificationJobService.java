@@ -3,6 +3,7 @@ package com.example.sauravvishal8797.newsyfy.service;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 
 import com.example.sauravvishal8797.newsyfy.models.NewsArticleModel;
 import com.example.sauravvishal8797.newsyfy.models.NewsResponseModel;
@@ -37,12 +38,13 @@ public class NotificationJobService extends JobService{
         TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         String countryISO = telephonyManager.getNetworkCountryIso();
         ApiInterface apiService =
-                ApiClient.getClient().create(ApiInterface.class);
+                ApiClient.getClient(getApplicationContext()).create(ApiInterface.class);
         call = apiService.getTopHeadLines(countryISO, Constants.RESULTS_PER_PAGE, 1, Constants.API_KEY);
         call.enqueue(new Callback<NewsResponseModel>() {
             @Override
             public void onResponse(Call<NewsResponseModel> call, Response<NewsResponseModel> response) {
                 if (response!=null) {
+                    Log.i("fuckkkkk", "lo");
                     ArrayList<NewsArticleModel> newsArticleModels = response.body().getmNewsArticleModels();
                     NewsArticleModel topNewsArticle = newsArticleModels.get(0);
                     String title = topNewsArticle.getmTitle();
