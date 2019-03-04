@@ -36,7 +36,7 @@ public class MainActivityUnitTest {
     @Test
     public void getTopHeadlinesTest(){
         ApiInterface mockedApiInterface = Mockito.mock(ApiInterface.class);
-        Call<NewsResponseModel> mockedCall = Mockito.mock(Call.class);
+        final Call<NewsResponseModel> mockedCall = Mockito.mock(Call.class);
         Mockito.when(mockedApiInterface.getTopHeadLines("in", Constants.RESULTS_PER_PAGE, 1,
                 Constants.API_KEY)).thenReturn(mockedCall);
         Mockito.doAnswer(new Answer() {
@@ -55,7 +55,7 @@ public class MainActivityUnitTest {
     @Test
     public void getSearchedArticlesTest(){
         ApiInterface mockedApiInterface = Mockito.mock(ApiInterface.class);
-        Call<NewsResponseModel> mockedCall = Mockito.mock(Call.class);
+        final Call<NewsResponseModel> mockedCall = Mockito.mock(Call.class);
         Mockito.when(mockedApiInterface.getItemsWithSearchWord("cricket", Constants.RESULTS_PER_PAGE, 1,
                 Constants.API_KEY)).thenReturn(mockedCall);
         Mockito.doAnswer(new Answer() {
@@ -74,7 +74,7 @@ public class MainActivityUnitTest {
     @Test
     public void getAllSources(){
         ApiInterface mockedApiInterface = Mockito.mock(ApiInterface.class);
-        Call<SourceResponseModel> mockedCall = Mockito.mock(Call.class);
+        final Call<SourceResponseModel> mockedCall = Mockito.mock(Call.class);
         Mockito.when(mockedApiInterface.getAllTheSources(Constants.API_KEY)).thenReturn(mockedCall);
         Mockito.doAnswer(new Answer() {
             @Override
@@ -89,7 +89,7 @@ public class MainActivityUnitTest {
     @Test
     public void getSourceFilteredArticleTest(){
         ApiInterface mockedApiInterface = Mockito.mock(ApiInterface.class);
-        Call<NewsResponseModel> mockedCall = Mockito.mock(Call.class);
+        final Call<NewsResponseModel> mockedCall = Mockito.mock(Call.class);
         Mockito.when(mockedApiInterface.getHeadLinesFromSources("bbc-news, abc-news", Constants.RESULTS_PER_PAGE, 1,
                 Constants.API_KEY)).thenReturn(mockedCall);
         Mockito.doAnswer(new Answer() {
