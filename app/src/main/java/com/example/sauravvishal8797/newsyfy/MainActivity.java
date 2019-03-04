@@ -334,9 +334,10 @@ public class MainActivity extends AppCompatActivity {
                     else newsDataList = response.body().getmNewsArticleModels();
                     totalResults = response.body().getmTotalResults();
                     displayProgressBar(false);
-                    if (mSwipeRefreshLayout.isRefreshing()) {
+                    /**if (mSwipeRefreshLayout.isRefreshing()) {
                         mSwipeRefreshLayout.setRefreshing(false);
-                    }
+                    }*/
+                    mSwipeRefreshLayout.setRefreshing(false);
                     newsAdapter.swapDataSet(newsDataList);
                     isLoading = false;
                 }
