@@ -10,6 +10,8 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.webkit.WebView;
 
+import com.example.sauravvishal8797.newsyfy.R;
+
 public class NotificationHelper {
 
     private static final String PRIMARY_CHANNEL_ID = "trending_news_notification_channel";
@@ -45,6 +47,7 @@ public class NotificationHelper {
         PendingIntent pendingIntent = PendingIntent.getActivity(mContext, NOTIFICATION_ID, notificationIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Builder notifyBuilder = new NotificationCompat.Builder(mContext, PRIMARY_CHANNEL_ID)
+                .setSmallIcon(R.mipmap.ic_launcher_round)
                 .setContentTitle(notificationTitle)
                 .setContentText(notificationtext)
                 .setAutoCancel(true)
