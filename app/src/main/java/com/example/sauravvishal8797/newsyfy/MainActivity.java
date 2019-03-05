@@ -109,7 +109,6 @@ public class MainActivity extends AppCompatActivity {
         //Trending news notification job scheduler
         NotificationJobScheduler notificationJobScheduler = new NotificationJobScheduler(this);
         notificationJobScheduler.scheduleJob();
-
         newsDataList = new ArrayList<>();
         android.support.v7.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -323,20 +322,20 @@ public class MainActivity extends AppCompatActivity {
         telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         countryISO = telephonyManager.getNetworkCountryIso();
         ApiInterface apiService =
-                ApiClient.getClient(this).create(ApiInterface.class);
+                ApiClient.getClient(getApplicationContext()).create(ApiInterface.class);
         call = apiService.getTopHeadLines(countryISO, Constants.RESULTS_PER_PAGE, pageNo, Constants.API_KEY);
         call.enqueue(new Callback<NewsResponseModel>() {
             @Override
             public void onResponse(Call<NewsResponseModel> call, Response<NewsResponseModel> response) {
                 if (response!=null) {
-                    if (isLoading)
+                    if (isLoading&&newsDataList.size()!=0) {
                         newsDataList.addAll(response.body().getmNewsArticleModels());
-                    else newsDataList = response.body().getmNewsArticleModels();
+                    }
+                    else {
+                        newsDataList = response.body().getmNewsArticleModels();
+                    }
                     totalResults = response.body().getmTotalResults();
                     displayProgressBar(false);
-                    /**if (mSwipeRefreshLayout.isRefreshing()) {
-                        mSwipeRefreshLayout.setRefreshing(false);
-                    }*/
                     mSwipeRefreshLayout.setRefreshing(false);
                     newsAdapter.swapDataSet(newsDataList);
                     isLoading = false;

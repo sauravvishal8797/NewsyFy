@@ -1,22 +1,30 @@
 package com.example.sauravvishal8797.newsyfy.models;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class SourceInfo {
 
     @SerializedName("id")
+    @Expose
     private String mId;
     @SerializedName("name")
+    @Expose
     private String mName;
     @SerializedName("description")
+    @Expose
     private String mDescription;
     @SerializedName("url")
+    @Expose
     private String mUrl;
     @SerializedName("category")
+    @Expose
     private String mCategory;
     @SerializedName("language")
+    @Expose
     private String mLanguage;
     @SerializedName("country")
+    @Expose
     private String mCountry;
 
     public void setmId(String mId) {

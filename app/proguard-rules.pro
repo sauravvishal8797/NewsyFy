@@ -26,9 +26,29 @@
 -dontwarn javax.annotation.**
 #OKhttp RULES END
 
+-dontnote retrofit2.Platform
+# Platform used when running on Java 8 VMs. Will not be used at runtime.
+-dontwarn retrofit2.Platform$Java8
+
 #picasso rules START
 -dontwarn com.squareup.okhttp.**
 #picasso rules END
 
+-keepclassmembers public class * {
+    @com.google.gson.annotations.Expose *;
+}
+
+-keepclassmembers public class * {
+    @com.google.gson.annotations.SerializedName *;
+}
+
+-keepattributes Signature
+-keepattributes *Annotation*
+
 -dontwarn okio.**
--dontwarn retrofit2.Platform$Java8
+-dontwarn retrofit2.**
+
+-keep class retrofit2.** { *; }
+
+
+

@@ -1,5 +1,6 @@
 package com.example.sauravvishal8797.newsyfy.models;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
@@ -7,10 +8,13 @@ import java.util.ArrayList;
 public class NewsResponseModel {
 
     @SerializedName("status")
+    @Expose
     private String mStatus;
     @SerializedName("totalResults")
+    @Expose
     private int mTotalResults;
     @SerializedName("articles")
+    @Expose
     private ArrayList<NewsArticleModel> mNewsArticleModels;
 
     public NewsResponseModel(){}

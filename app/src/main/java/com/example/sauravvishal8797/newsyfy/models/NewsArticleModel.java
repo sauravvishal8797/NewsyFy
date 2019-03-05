@@ -2,6 +2,7 @@ package com.example.sauravvishal8797.newsyfy.models;
 
 import android.support.annotation.NonNull;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.text.ParseException;
@@ -11,20 +12,28 @@ import java.util.Date;
 public class NewsArticleModel implements Comparable{
 
     @SerializedName("source")
+    @Expose
     private NewsSourceModel newsSourceModel;
     @SerializedName("author")
+    @Expose
     private String mAuthor;
     @SerializedName("title")
+    @Expose
     private String mTitle;
     @SerializedName("description")
+    @Expose
     private String mDescription;
     @SerializedName("url")
+    @Expose
     private String mUrl;
     @SerializedName("urlToImage")
+    @Expose
     private String mUrlToImage;
     @SerializedName("publishedAt")
+    @Expose
     private String mPublishTime;
     @SerializedName("content")
+    @Expose
     private String mContent;
 
     public NewsArticleModel(NewsSourceModel newsSourceModel, String author, String title, String description,

@@ -1,5 +1,6 @@
 package com.example.sauravvishal8797.newsyfy.models;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
@@ -7,8 +8,10 @@ import java.util.ArrayList;
 public class SourceResponseModel {
 
     @SerializedName("status")
+    @Expose
     private String mStatus;
     @SerializedName("sources")
+    @Expose
     private ArrayList<SourceInfo> mSourceInfo;
 
     public void setmStatus(String mStatus) {

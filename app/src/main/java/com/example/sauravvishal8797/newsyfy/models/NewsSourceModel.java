@@ -1,12 +1,15 @@
 package com.example.sauravvishal8797.newsyfy.models;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class NewsSourceModel {
 
     @SerializedName("id")
+    @Expose
     private String mId;
     @SerializedName("name")
+    @Expose
     private String mName;
 
     public NewsSourceModel(String id, String name){
