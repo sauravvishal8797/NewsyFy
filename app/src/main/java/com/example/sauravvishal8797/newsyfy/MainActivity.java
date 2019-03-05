@@ -89,19 +89,6 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    //handles onSwipe refresh configurations
-    private SwipeRefreshLayout.OnRefreshListener refreshListener = new SwipeRefreshLayout.OnRefreshListener() {
-        @Override
-        public void onRefresh() {
-            pageNo = 1;
-            if (isSearchLoading){
-                getSearchedArticles(searchQuery);
-            } else {
-                getTopHeadLines(pageNo);
-            }
-        }
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -125,7 +112,17 @@ public class MainActivity extends AppCompatActivity {
     /**Sets up the UI for displaying news articles*/
     private void setUpUI() {
         mSwipeRefreshLayout = findViewById(R.id.onSwipeRefresh);
-        mSwipeRefreshLayout.setOnRefreshListener(refreshListener);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                pageNo = 1;
+                if (isSearchLoading){
+                    getSearchedArticles(searchQuery);
+                } else {
+                    getTopHeadLines(pageNo);
+                }
+            }
+        });
         mNewsDisplayView = findViewById(R.id.news_display_recyclerview);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         mNewsDisplayView.setLayoutManager(linearLayoutManager);
@@ -203,18 +200,18 @@ public class MainActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
+                searchQuery = s;
+                isSearchLoading = true;
+                if (!s.isEmpty()) {
+                    displayProgressBar(true);
+                    getSearchedArticles(searchQuery);
+                }
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String s) {
-                searchQuery = s;
-                isSearchLoading = true;
-                if (!s.isEmpty()) {
-                    displayProgressBar(true);
-                    getSearchedArticles(s);
-                }
-                return true;
+                return false;
             }
         });
         item.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
@@ -225,9 +222,9 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+                searchQuery=" ";
                 isSearchLoading = false;
                 if (!searchQuery.isEmpty()){
-                    Log.i("sattire", searchQuery);
                     displayProgressBar(true);
                     getTopHeadLines(pageNo);
                 }
@@ -249,10 +246,8 @@ public class MainActivity extends AppCompatActivity {
 
             case R.id.filter_by_date:
                  if (item.isChecked()){
-                     Log.i("checked", "yes");
                      item.setChecked(false);
                  } else {
-                     Log.i("checked", "no");
                      item.setChecked(true);
                      Collections.sort(newsDataList);
                      newsAdapter.swapDataSet(newsDataList);
@@ -307,8 +302,8 @@ public class MainActivity extends AppCompatActivity {
             newsAdapter.swapDataSet(newsDataList);
             mProgressBar.setVisibility(View.VISIBLE);
         } else {
-            mSwipeRefreshLayout.setEnabled(true);
             mProgressBar.setVisibility(View.GONE);
+            mSwipeRefreshLayout.setEnabled(true);
         }
     }
 
@@ -327,17 +322,18 @@ public class MainActivity extends AppCompatActivity {
         call.enqueue(new Callback<NewsResponseModel>() {
             @Override
             public void onResponse(Call<NewsResponseModel> call, Response<NewsResponseModel> response) {
-                if (response!=null) {
+                if (response!=null&&response.body()!=null) {
+                    mSwipeRefreshLayout.setRefreshing(false);
                     if (isLoading&&newsDataList.size()!=0) {
                         newsDataList.addAll(response.body().getmNewsArticleModels());
                     }
                     else {
+                        newsDataList = new ArrayList<>();
                         newsDataList = response.body().getmNewsArticleModels();
                     }
                     totalResults = response.body().getmTotalResults();
-                    displayProgressBar(false);
-                    mSwipeRefreshLayout.setRefreshing(false);
                     newsAdapter.swapDataSet(newsDataList);
+                    displayProgressBar(false);
                     isLoading = false;
                 }
             }
@@ -362,13 +358,18 @@ public class MainActivity extends AppCompatActivity {
         call.enqueue(new Callback<NewsResponseModel>() {
             @Override
             public void onResponse(Call<NewsResponseModel> call, Response<NewsResponseModel> response) {
-                if (response!=null) {
-                    if (isLoading)
-                        newsDataList.addAll(response.body().getmNewsArticleModels());
-                    else newsDataList = response.body().getmNewsArticleModels();
-                    displayProgressBar(false);
+                if (response!=null&&response.body()!=null) {
                     mSwipeRefreshLayout.setRefreshing(false);
+                    if (isLoading){
+                        newsDataList.addAll(response.body().getmNewsArticleModels());
+                    }
+                    else {
+                        newsDataList = new ArrayList<>();
+                        newsDataList = response.body().getmNewsArticleModels();
+                    }
+                    //Log.i("chachattilte", newsDataList.get(0).getmTitle());
                     newsAdapter.swapDataSet(newsDataList);
+                    displayProgressBar(false);
                     isLoading = false;
                 }
             }
