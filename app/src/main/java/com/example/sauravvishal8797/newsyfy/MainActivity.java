@@ -70,6 +70,9 @@ public class MainActivity extends AppCompatActivity {
     //storing search query for particular search
     private String searchQuery = " ";
 
+    //to store the filtered sources names
+    private StringBuilder stringBuilder;
+
     //to store all the news source names
     private String[] sourceNames;
 
@@ -224,6 +227,7 @@ public class MainActivity extends AppCompatActivity {
             public boolean onMenuItemActionCollapse(MenuItem menuItem) {
                 searchQuery=" ";
                 isSearchLoading = false;
+                isSourceFiltering = false;
                 if (!searchQuery.isEmpty()){
                     displayProgressBar(true);
                     getTopHeadLines(pageNo);
@@ -282,7 +286,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 isSourceFiltering = true;
-                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder = new StringBuilder();
                 dialogInterface.dismiss();
                 for (String id: selectedSources){
                     stringBuilder.append(id+",");
@@ -351,10 +355,16 @@ public class MainActivity extends AppCompatActivity {
      * @return List of news articles
      */
     public void getSearchedArticles(String searchKeyword){
+        Call<NewsResponseModel> call = null;
         isSearchLoading = true;
         ApiInterface apiInterface = ApiClient.getClient(this).create(ApiInterface.class);
-        Call<NewsResponseModel> call = apiInterface.getItemsWithSearchWord(searchKeyword, Constants.RESULTS_PER_PAGE, pageNo,
-                Constants.API_KEY);
+        if (isSourceFiltering){
+            call = apiInterface.getHeadLinesFromSources(searchKeyword, stringBuilder.toString(), Constants.RESULTS_PER_PAGE, pageNo,
+                    Constants.API_KEY);
+        } else {
+            call = apiInterface.getItemsWithSearchWord(searchKeyword, Constants.RESULTS_PER_PAGE, pageNo,
+                    Constants.API_KEY);
+        }
         call.enqueue(new Callback<NewsResponseModel>() {
             @Override
             public void onResponse(Call<NewsResponseModel> call, Response<NewsResponseModel> response) {
@@ -414,9 +424,11 @@ public class MainActivity extends AppCompatActivity {
      * @return a list of articles from the specified sources
      */
     private void getSourceFilteredArticles(String sources){
+        Call<NewsResponseModel> call = null;
         ApiInterface apiInterface = ApiClient.getClient(this).create(ApiInterface.class);
-        Call<NewsResponseModel> call = apiInterface.getHeadLinesFromSources(sources, Constants.RESULTS_PER_PAGE, pageNo,
-                Constants.API_KEY);
+        if (!searchQuery.equals(" ")){
+            call = apiInterface.getHeadLinesFromSources(searchQuery, sources, Constants.RESULTS_PER_PAGE, pageNo, Constants.API_KEY);
+        } else call = apiInterface.getHeadLinesFromSources(sources, Constants.RESULTS_PER_PAGE, pageNo, Constants.API_KEY);
         call.enqueue(new Callback<NewsResponseModel>() {
             @Override
             public void onResponse(Call<NewsResponseModel> call, Response<NewsResponseModel> response) {

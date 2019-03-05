@@ -19,6 +19,12 @@ public interface ApiInterface {
     Call<NewsResponseModel> getHeadLinesFromSources( @Query("sources") String sources, @Query("pageSize") int pageSize,
                                                      @Query("page") int page, @Query("apiKey") String apiKey);
 
+    //retrieve top-news headlines from specified sources based on a search query
+    @GET("top-headlines")
+    Call<NewsResponseModel> getHeadLinesFromSources( @Query("q") String queryString, @Query("sources") String sources,
+                                                     @Query("pageSize") int pageSize, @Query("page") int page, @Query("apiKey")
+                                                             String apiKey);
+
     //retrives category-wise top-news headlines
     @GET("top-headlines")
     Call<NewsResponseModel> getTopHeadlinesCategoryWise(@Query("country") String country, @Query("category") String category,
